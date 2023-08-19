@@ -9,7 +9,7 @@ ENV RUSTFLAGS "-Lnative=/usr/lib -C target-cpu=${TARGET_CPU}"
 
 RUN apk upgrade && \
     apk add curl gcc g++ musl-dev cmake make && \
-    curl -sSf https://sh.rustup.rs | sh -s -- --profile minimal --component rust-src --default-toolchain nightly -y
+    curl -sSf https://sh.rustup.rs | sh -s -- --profile minimal --component rust-src --default-toolchain nightly-2023-06-27 -y
 
 WORKDIR /build
 
