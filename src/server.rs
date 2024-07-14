@@ -25,7 +25,13 @@ use tokio::{
 use tokio_websockets::{Error, Limits, Message, ServerBuilder};
 use tracing::{debug, error, info, trace, warn};
 
-use std::{convert::Infallible, future::ready, net::SocketAddr, sync::Arc};
+use std::{
+    convert::Infallible,
+    future::ready,
+    net::{IpAddr, SocketAddr},
+    str::FromStr,
+    sync::Arc,
+};
 
 use crate::{
     config::CONFIG,
@@ -386,7 +392,8 @@ fn handler(
 }
 
 pub async fn run(port: u16, state: State, metrics_handle: PrometheusHandle) -> Result<(), Error> {
-    let addr: SocketAddr = ([0, 0, 0, 0], port).into();
+    let ip = IpAddr::from_str("::").unwrap();
+    let addr: SocketAddr = (ip, port).into();
 
     let listener = match TcpListener::bind(addr).await {
         Ok(listener) => listener,
