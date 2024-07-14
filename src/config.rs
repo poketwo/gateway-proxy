@@ -230,7 +230,10 @@ pub fn load(path: &str) -> Result<Config, Error> {
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
-    match load("config.json") {
+    let config_path = var("CONFIG");
+    let config_path = config_path.as_deref().unwrap_or("config.json");
+
+    match load(config_path) {
         Ok(config) => config,
         Err(err) => {
             // Avoid panicking
