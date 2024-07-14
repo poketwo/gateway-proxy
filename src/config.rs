@@ -250,7 +250,10 @@ pub fn load(path: &str) -> Result<Config, Error> {
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
-    match load("config.json") {
+    let config_path = var("CONFIG");
+    let config_path = config_path.as_deref().unwrap_or("config.json");
+
+    match load(config_path) {
         Ok(config) => config,
         Err(err) => {
             // Avoid panicking
@@ -266,9 +269,12 @@ pub async fn watch_config_changes<S>(reload_handle: reload::Handle<LevelFilter, 
         return;
     };
 
+    let config_path = var("CONFIG");
+    let config_path = config_path.as_deref().unwrap_or("config.json");
+
     if inotify
         .watches()
-        .add("config.json", WatchMask::MODIFY)
+        .add(config_path, WatchMask::MODIFY)
         .is_err()
     {
         tracing::error!("Failed to add inotify watch, log-levels cannot be reloaded on the fly");
@@ -283,7 +289,7 @@ pub async fn watch_config_changes<S>(reload_handle: reload::Handle<LevelFilter, 
 
     while let Some(Ok(_)) = events.next().await {
         // This currently only supports reloading log-levels
-        if let Ok(config) = load("config.json") {
+        if let Ok(config) = load(config_path) {
             let _ = reload_handle.modify(|filter| {
                 *filter = LevelFilter::from_str(&config.log_level).unwrap_or(LevelFilter::INFO);
             });
