@@ -1,6 +1,6 @@
 # I will only support x86_64 hosts because this allows for best hardware optimizations.
 # Compiling a Dockerfile for aarch64 should work but I won't support it myself.
-ARG TARGET_CPU="haswell"
+ARG TARGET_CPU="x86-64"
 
 FROM docker.io/library/alpine:edge AS builder
 ARG TARGET_CPU
@@ -20,9 +20,9 @@ RUN mkdir src/
 RUN echo 'fn main() {}' > ./src/main.rs
 RUN source $HOME/.cargo/env && \
     if [ "$TARGET_CPU" == 'x86-64' ]; then \
-        cargo build --release --target="$RUST_TARGET" --no-default-features --features no-simd; \
+    cargo build --release --target="$RUST_TARGET" --no-default-features --features no-simd; \
     else \
-        cargo build --release --target="$RUST_TARGET"; \
+    cargo build --release --target="$RUST_TARGET"; \
     fi
 
 RUN rm -f target/$RUST_TARGET/release/deps/gateway_proxy*
@@ -30,9 +30,9 @@ COPY ./src ./src
 
 RUN source $HOME/.cargo/env && \
     if [ "$TARGET_CPU" == 'x86-64' ]; then \
-        cargo build --release --target="$RUST_TARGET" --no-default-features --features no-simd; \
+    cargo build --release --target="$RUST_TARGET" --no-default-features --features no-simd; \
     else \
-        cargo build --release --target="$RUST_TARGET"; \
+    cargo build --release --target="$RUST_TARGET"; \
     fi && \
     cp target/$RUST_TARGET/release/gateway-proxy /gateway-proxy && \
     strip /gateway-proxy
