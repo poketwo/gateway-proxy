@@ -25,7 +25,7 @@ use tokio_tungstenite::{
 };
 use tracing::{debug, error, info, trace, warn};
 
-use std::{convert::Infallible, net::SocketAddr, sync::Arc};
+use std::{convert::Infallible, net::{IpAddr, SocketAddr}, str::FromStr, sync::Arc};
 
 use crate::{
     cache::Event,
@@ -385,7 +385,8 @@ pub async fn run(
     state: State,
     metrics_handle: Arc<PrometheusHandle>,
 ) -> Result<(), Error> {
-    let addr: SocketAddr = ([0, 0, 0, 0], port).into();
+    let ip = IpAddr::from_str("::").unwrap();
+    let addr: SocketAddr = (ip, port).into();
 
     let service = make_service_fn(move |addr: &AddrStream| {
         let state = state.clone();
